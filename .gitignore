@@ -23,3 +23,6 @@ pnpm-debug.log*
 # Editor
 .vscode/
 .idea/
+
+# Credentials
+.pat_keys

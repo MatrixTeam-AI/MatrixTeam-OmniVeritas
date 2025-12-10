@@ -13,6 +13,7 @@ interface Props {
 }
 
 const {slug, heroImage, title, pubDate, updatedDate, tags} = Astro.props
+const BASE_URL = import.meta.env.BASE_URL
 
 ---
 
@@ -21,18 +22,18 @@ const {slug, heroImage, title, pubDate, updatedDate, tags} = Astro.props
 >
     <a
         class='img-container'
-        href={`/blog/${slug}`}
+        href={`${BASE_URL}/blog/${slug}`}
     >
         {heroImage && <img src={heroImage} alt={title} loading="lazy"/>}
     </a>
     <h4>
-        <a class="link" href={`/blog/${slug}`}>
+        <a class="link" href={`${BASE_URL}/blog/${slug}`}>
             {title}
         </a>
     </h4>
     <div class="tag-list">
         {tags.map((tag) => (
-            <a class="tag" href={`/tag/${tag}`}>{tag}</a>
+            <a class="tag" href={`${BASE_URL}/tag/${tag}`}>{tag}</a>
         ))}
     </div>
     <div class="date-container">

@@ -25,9 +25,9 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url('/bg.avif');
+  background-image: url("/MatrixTeam-OmniVeritas/bg.avif");
   html.dark & {
-    background-image: url('/bg-dark.avif');
+    background-image: url("/MatrixTeam-OmniVeritas/bg-dark.avif");
   }
   background-size: cover;
   background-repeat: no-repeat;
