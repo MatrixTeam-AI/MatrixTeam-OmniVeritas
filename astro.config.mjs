@@ -39,7 +39,7 @@ export default defineConfig({
       }
     }
   },
-  site: 'https://matrixteam-ai.github.io/',
-  base: '/MatrixTeam-OmniVeritas',
+  site: 'https://zhushangwen.github.io/',
+  base: '/Matrix-omini',
   integrations: [expressiveCode(), mdx(), sitemap(), svelte(), icon()]
 });
