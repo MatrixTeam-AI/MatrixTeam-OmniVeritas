@@ -23,10 +23,18 @@ We introduce **MAMBO-G** (Magnitude-Aware Mitigation for Boosted Guidance), a no
 
 ### Visual Comparison
 
-| Baseline CFG (Oversaturated) | MAMBO-G (Ours) |
-| :---: | :---: |
-| ![Baseline](/Matrix-omini/mambo-images/fig1_baseline.png) | ![Ours](/Matrix-omini/mambo-images/fig1_ours.png) |
-| *Figure 1: Comparison between standard CFG (left) and MAMBO-G (right). Standard CFG leads to severe oversaturation and artifacts at high guidance scales, while MAMBO-G maintains structural integrity and visual quality.* | |
+<div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
+  <div style="flex: 1; text-align: center;">
+    <img src="/Matrix-omini/mambo-images/fig1_baseline.png" alt="Baseline CFG" style="width: 100%; border-radius: 8px;">
+    <p style="margin-top: 5px;"><strong>Baseline CFG</strong><br>(Oversaturated)</p>
+  </div>
+  <div style="flex: 1; text-align: center;">
+    <img src="/Matrix-omini/mambo-images/fig1_ours.png" alt="MAMBO-G (Ours)" style="width: 100%; border-radius: 8px;">
+    <p style="margin-top: 5px;"><strong>MAMBO-G</strong><br>(Ours)</p>
+  </div>
+</div>
+
+<p style="text-align: center; color: #666; font-style: italic; margin-top: 0;">Figure 1: Comparison between standard CFG (left) and MAMBO-G (right). Standard CFG leads to severe oversaturation and artifacts at high guidance scales, while MAMBO-G maintains structural integrity and visual quality.</p>
 
 ## Key Challenges
 
