@@ -34,7 +34,7 @@ We introduce **MAMBO-G** (Magnitude-Aware Mitigation for Boosted Guidance), a no
   </div>
 </div>
 
-<p style="text-align: center; color: #666; font-style: italic; margin-top: 0;">Figure 1: Comparison between standard CFG (left) and MAMBO-G (right). Standard CFG leads to severe oversaturation and artifacts at high guidance scales, while MAMBO-G maintains structural integrity and visual quality.</p>
+<p style="text-align: center; color: #666; font-style: italic; margin-top: 0;">Figure 1: Comparison between standard CFG (left) and MAMBO-G (right). Both results are generated using 10 sampling steps with a guidance scale of 4. Standard CFG leads to severe oversaturation and artifacts, while MAMBO-G maintains structural integrity and visual quality.</p>
 
 ## Key Challenges
 
@@ -43,7 +43,7 @@ Recent large-scale diffusion and flow-matching models face specific challenges w
 1.  **Instability at High Guidance:** Strong guidance, while necessary for prompt adherence, often collapses the generation process into artifacts or oversaturated images.
 2.  **The "Overshoot" Phenomenon:** In high-dimensional spaces, the initial noise ($t=1$) is statistically independent of the target data. The guidance update at this stage tends to be a generic direction determined solely by the text prompt. Applying large CFG scales here forces the generation trajectory to deviate significantly from the data manifold.
 
-![Interval Analysis](/Matrix-omini/mambo-images/interval.png)
+![Interval Analysis](/Matrix-omini/mambo-images/fig2_interval.png)
 *Figure 2: Analysis of guidance interval impact. The plot illustrates how guidance strength varies across different timesteps, highlighting the critical early stage where overshoot is most likely to occur.*
 
 ## The MAMBO-G Solution
