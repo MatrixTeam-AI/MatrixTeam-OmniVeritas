@@ -66,7 +66,7 @@ $$
 r_t(\mathbf{x}_t, t) = \frac{\|\mathbf{v}_{\text{cond}}(\mathbf{x}_t, t) - \mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|}{\|\mathbf{v}_{\text{uncond}}(\mathbf{x}_t, t)\|}
 $$
 
-This ratio measures the relative strength of the "external guidance force" against the "internal denoising force" (using the **unconditional prediction as the base**). A high ratio indicates a potential risk of overshoot.
+We interpret this ratio as a **Coefficient of Variation (CV)** for the diffusion process. It quantifies the relative magnitude of the guidance update (representing the "variation") with respect to the unconditional prediction (representing the "base" or "mean"). A high coefficient implies that the guidance force is overwhelming the intrinsic denoising direction, signaling a potential risk of overshoot and instability.
 
 Based on this ratio, MAMBO-G applies an adaptive damping factor to the guidance scale:
 
