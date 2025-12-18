@@ -36,12 +36,17 @@ We introduce **MAMBO-G** (Magnitude-Aware Mitigation for Boosted Guidance), a no
 
 <p style="text-align: center; color: #666; font-style: italic; margin-top: 0;">Figure 1: Comparison between standard CFG (left) and MAMBO-G (right). Both results are generated using 10 sampling steps with a guidance scale of 4. Standard CFG leads to severe oversaturation and artifacts, while MAMBO-G maintains structural integrity and visual quality.</p>
 
-## Key Challenges
+### Instability at High Guidance
+Strong guidance is essential for ensuring the generated content adheres to the text prompt. However, as model scales increase, simply boosting the guidance scale often backfires. The generation process collapses, yielding images with **oversaturated colors**, **unnatural high-contrast artifacts**, and **structural disintegration**. This instability is not just a random error but a systematic failure mode in modern high-dimensional diffusion and flow-matching models.
 
-Recent large-scale diffusion and flow-matching models face specific challenges with CFG:
+### The "Overshoot" Phenomenon: A Geometric Perspective
+Why does strong guidance fail? Our analysis traces the root cause to the initialization phase (Zero-SNR, $t=1$).
 
-1.  **Instability at High Guidance:** Strong guidance, while necessary for prompt adherence, often collapses the generation process into artifacts or oversaturated images.
-2.  **The "Overshoot" Phenomenon:** In high-dimensional spaces, the initial noise ($t=1$) is statistically independent of the target data. The guidance update at this stage tends to be a generic direction determined solely by the text prompt. Applying large CFG scales here forces the generation trajectory to deviate significantly from the data manifold.
+1.  **Generic Direction at Initialization:** At the very start ($t=1$), the input is pure Gaussian noise, statistically independent of the target data. Consequently, the model's guidance update vector ($\Delta \mathbf{v}$) depends *solely* on the text prompt, ignoring the specific structure of the initial noise.
+2.  **The Conflict:** Empirically, we observe that the guidance direction is nearly identical (Cosine Similarity $\approx 1.0$) across different random seeds at $t=1$. This means the guidance pushes *every* sample in the exact same "generic" direction.
+3.  **Manifold Deviation:** In high-dimensional latent spaces, applying a large guidance scale to this generic vector forces the generation trajectory to move aggressively along a path that likely does not align with the specific noise instance's optimal path to the data manifold. This results in a severe **"overshoot,"** driving the state into invalid regions of the latent space from which the model cannot recover.
+
+**MAMBO-G addresses this by detecting when the guidance is acting in this "blind," generic manner and temporarily dampening it.**
 
 ### Visual Comparison 2
 
