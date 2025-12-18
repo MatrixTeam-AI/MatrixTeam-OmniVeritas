@@ -1,0 +1,53 @@
+<style is:global>
+
+  .gslide-description {
+    background: rgba(0, 0, 0, 0.0) !important; 
+  }
+
+  .gdesc-inner {
+    text-align: center !important;
+    padding: 15px 20px !important;
+  }
+
+  .gslide-title {
+    color: #ffffff !important;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .gslide-desc {
+    color: #eeeeee !important;
+    font-family: 'Comic Neue', 'Klee One', sans-serif !important;
+    font-size: 0.9em;
+  }
+</style>
+
+<script>
+  import GLightbox from 'glightbox';
+  import 'glightbox/dist/css/glightbox.min.css';
+
+  const setupLightbox = () => {
+    const images = document.querySelectorAll('article img');
+    
+    images.forEach((img) => {
+      const link = document.createElement('a');
+      link.className = 'glightbox';
+      link.href = (img as HTMLImageElement).src;
+      
+      link.dataset.description = (img as HTMLImageElement).alt;
+      
+      img.parentNode?.insertBefore(link, img);
+      link.appendChild(img);
+    });
+
+    GLightbox({
+      selector: '.glightbox',
+      touchNavigation: true,
+      loop: true,
+      autoplayVideos: true,
+    });
+  };
+
+  setupLightbox();
+  document.addEventListener('astro:after-swap', setupLightbox);
+</script>

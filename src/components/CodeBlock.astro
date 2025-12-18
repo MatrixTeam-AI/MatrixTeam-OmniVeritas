@@ -1,0 +1,96 @@
+<script>
+  const BASE_URL = import.meta.env.BASE_URL
+  const attachImagesFromCode = () => {
+    const imageRegex = /(?:["'\s]|^)((?:https?:\/\/|[\.\/])[^"'\s>]+\.(?:png|jpg|jpeg|gif|webp|svg|avif))(?:["'\s]|$)/gi;
+    const codeBlocks = document.querySelectorAll('pre');
+    codeBlocks.forEach((pre) => {
+      const codeText = pre.innerText;
+      const matches = codeText.match(imageRegex);
+
+      if (matches) {
+        if (pre.nextElementSibling?.classList.contains('code-attachments')) return;
+
+        const container = document.createElement('div');
+        container.className = 'code-attachments'; 
+        
+        [...new Set(matches)].forEach((url) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'attachment-item';
+          let finalUrl = url.replace(/^['"]|['"]$/g, '');
+
+          if (finalUrl.startsWith('.')) {
+            const pathWithoutDot = finalUrl.substring(1);
+            finalUrl = (BASE_URL + pathWithoutDot).replace(/\/+/g, '/');
+          }
+          wrapper.innerHTML = `
+            <div class="attachment-label">${url}:&nbsp;</div>
+            <img src="${finalUrl}" alt="Attachment" class="attachment-img" />&nbsp;
+          `;
+          container.appendChild(wrapper);
+        });
+
+        pre.after(container);
+      }
+    });
+  };
+
+  window.addEventListener('load', attachImagesFromCode);
+  document.addEventListener('astro:after-swap', attachImagesFromCode);
+</script>
+
+<style is:global>
+  .code-attachments {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    font-family: 'Comic Neue', 'Klee One', sans-serif !important;
+  }
+
+  .attachment-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 200px;
+    max-width: 300px;
+  }
+
+  .attachment-label {
+    display: inline-block !important;
+    font-size: 12px;
+    color: #8b949e;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .attachment-img {
+    width: 100%;
+    max-height: 40px !important;
+    object-fit: cover;
+    border-radius: 6px !important;
+    border: 2px solid #444 !important;
+    transition: transform 0.2s;
+    cursor: pointer;
+  }
+
+  .attachment-img:hover {
+    transform: scale(1.02);
+  }
+
+  .attachment-link {
+    display: block;
+    font-size: 12px;
+    color: #58a6ff;
+    text-decoration: none;
+    margin-top: 0.4rem;
+  }
+</style>

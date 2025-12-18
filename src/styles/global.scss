@@ -1,5 +1,7 @@
 @use "colors";
 
+$root: "/MatrixTeam-OmniVeritas";
+
 * {
   padding: 0;
   margin: 0;
@@ -25,9 +27,9 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url("/MatrixTeam-OmniVeritas/bg.avif");
+  background-image: url("#{$root}/bg.avif");
   html.dark & {
-    background-image: url("/MatrixTeam-OmniVeritas/bg-dark.avif");
+    background-image: url("#{$root}/bg-dark.avif");
   }
   background-size: cover;
   background-repeat: no-repeat;
