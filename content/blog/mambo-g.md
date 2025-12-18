@@ -3,7 +3,7 @@ title: 'MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance'
 description: 'Introducing a novel strategy to mitigate instability in boosted guidance for diffusion models, improving both quality and speed.'
 pubDate: 'Dec 17 2025'
 pinned: true
-heroImage: '/Matrix-omini/mambo-images/header.png'
+heroImage: '/MatrixTeam-OmniVeritas/mambo-images/header.png'
 tags:
   - diffusion-models
   - generative-ai
@@ -13,7 +13,7 @@ tags:
 
 # MAMBO-G: Magnitude-Aware Mitigation for Boosted Guidance
 
-**Authors:** Shangwenzhu et al.
+**Authors:** Shangwenzhu Zhileishu Ruilifeng.
 
 ## Abstract
 
@@ -25,11 +25,11 @@ We introduce **MAMBO-G** (Magnitude-Aware Mitigation for Boosted Guidance), a no
 
 <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
   <div style="flex: 1; text-align: center;">
-    <img src="/Matrix-omini/mambo-images/fig1_baseline.png" alt="Baseline CFG" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/fig1_baseline.png" alt="Baseline CFG" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>Baseline CFG</strong><br>(Oversaturated)</p>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="/Matrix-omini/mambo-images/fig1_ours.png" alt="MAMBO-G (Ours)" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/fig1_ours.png" alt="MAMBO-G (Ours)" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>MAMBO-G</strong><br>(Ours)</p>
   </div>
 </div>
@@ -47,11 +47,11 @@ Recent large-scale diffusion and flow-matching models face specific challenges w
 
 <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
   <div style="flex: 1; text-align: center;">
-    <img src="/Matrix-omini/mambo-images/fig2_baseline.png" alt="Baseline CFG (Detailed)" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/fig2_baseline.png" alt="Baseline CFG (Detailed)" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>Baseline CFG</strong></p>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="/Matrix-omini/mambo-images/fig2_ours.png" alt="MAMBO-G (Detailed)" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/fig2_ours.png" alt="MAMBO-G (Detailed)" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>MAMBO-G</strong></p>
   </div>
 </div>
@@ -86,6 +86,3 @@ This ensures that guidance is suppressed when the risk is high (typically at the
 
 MAMBO-G offers a theoretically grounded and practically effective solution to the instability problems of Classifier-Free Guidance in high-dimensional generative models. By making guidance magnitude-aware, it unlocks the full potential of large-scale models, enabling faster and higher-quality generation.
 
----
-
-*This project is supported by National Natural Science Foundation of China and National Key Research Projects.*
