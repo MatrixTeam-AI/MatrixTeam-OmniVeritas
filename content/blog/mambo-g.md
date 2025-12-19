@@ -87,303 +87,58 @@ This ensures that guidance is suppressed when the risk is high (typically at the
 -   **Accelerated Inference:** Achieves high-quality generation in fewer steps. Experiments show comparable quality to standard CFG with significantly fewer steps (e.g., 3x speedup on SD3.5, 4x on Lumina).
 -   **Plug-and-Play Compatibility:** MAMBO-G does not require model retraining. It can be easily integrated into existing DiT (Diffusion Transformer) architectures and samplers.
 
-## Our result on Qwen-Image
+## Our result on Qwen-Image (via Modular Diffusers & Guider)
 
 ### Original Qwen-Image Pipeline
 
 #### Code Example
 
 ```python
-from diffusers import QwenImagePipeline
 import torch
+from diffusers.modular_pipelines import SequentialPipelineBlocks
+from diffusers.modular_pipelines.qwenimage import TEXT2IMAGE_BLOCKS
+from diffusers.guiders import MagnitudeAwareGuidance, ClassifierFreeGuidance
+blocks = SequentialPipelineBlocks.from_blocks_dict(TEXT2IMAGE_BLOCKS)
 
-model_name = "Qwen/Qwen-Image"
-
-device = "cuda"
-pipe = QwenImagePipeline.from_pretrained(model_name, torch_dtype=torch.bfloat16)
-pipe = pipe.to(device)
-prompt = "a comic potrait of a female necromancer with big and cute eyes, fine - face, realistic shaded perfect face, fine details. night setting. very anime style. realistic shaded lighting poster by ilya kuvshinov katsuhiro, magali villeneuve, artgerm, jeremy lipkin and michael garmash, rob rey and kentaro miura style, trending on art station"
-negative_prompt = " "
-width, height = 1328, 1328
-num_inference_steps = 10
-image = pipe(
-    prompt=prompt,
-    negative_prompt=negative_prompt,
-    width=width,
-    height=height,
-    num_inference_steps=num_inference_steps,
-    true_cfg_scale=4.0,
-    generator=torch.Generator(device="cuda").manual_seed(1),
-    cfg_type="original",
-).images[0]
-image.save(f"qwenimage_result.png")
-
-image = pipe(
-    prompt=prompt,
-    negative_prompt=negative_prompt,
-    width=width,
-    height=height,
-    num_inference_steps=num_inference_steps,
-    true_cfg_scale=10,
-    generator=torch.Generator(device="cuda").manual_seed(1),
-    cfg_type="mambo_g",
-).images[0]
-image.save(f"qwenimage_result_mambo.png")
-```
-
-#### Results
-
-<div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
-  <div style="flex: 1; text-align: center;"> 
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_result_mambo.png" alt="MAMBO-G 10 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>MAMBO-G 10-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_result.png" alt="Original 10 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 10-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_result_30.png" alt="Original 30 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 30-Steps</strong></p>
-  </div>
-</div> 
-
-### Qwen-Image Controlnet Pipeline
-
-#### Code Example
-
-```python
-
-from diffusers import QwenImageControlNetPipeline, QwenImageControlNetModel
-import torch
-from diffusers.utils import load_image
-
-base_model = "Qwen/Qwen-Image"
-controlnet_model = "Qwen/Qwen-Image-ControlNet-Union"
-
-controlnet = QwenImageControlNetModel.from_pretrained(controlnet_model, torch_dtype=torch.bfloat16)
-
-pipe = QwenImageControlNetPipeline.from_pretrained(
-    base_model, controlnet=controlnet, torch_dtype=torch.bfloat16
-)
-pipe.to("cuda")
-
-control_image = load_image("./mambo-images/depth.png")
-prompt = "A swanky, minimalist living room with a huge floor-to-ceiling window letting in loads of natural light. A beige couch with white cushions sits on a wooden floor, with a matching coffee table in front. The walls are a soft, warm beige, decorated with two framed botanical prints. A potted plant chills in the corner near the window. Sunlight pours through the leaves outside, casting cool shadows on the floor."
-controlnet_conditioning_scale = 1.0
-steps = 10
-
-image = pipe(
-    prompt=prompt,
-    negative_prompt=" ",
-    control_image=control_image,
-    controlnet_conditioning_scale=controlnet_conditioning_scale,
-    width=control_image.size[0],
-    height=control_image.size[1],
-    num_inference_steps=steps,
-    true_cfg_scale=4,
-    generator=torch.Generator(device="cuda").manual_seed(42),
-).images[0]
-image.save(f"qwenimage_cn_union_result.png")
-
-image = pipe(
-    prompt=prompt,
-    negative_prompt=" ",
-    control_image=control_image,
-    controlnet_conditioning_scale=controlnet_conditioning_scale,
-    width=control_image.size[0],
-    height=control_image.size[1],
-    num_inference_steps=steps,
-    true_cfg_scale=10.0,
-    generator=torch.Generator(device="cuda").manual_seed(42),
-    cfg_type="mambo_g",
-    cfg_kwargs={"debug_ratio": True}
-).images[0]
-image.save(f"qwenimage_cn_union_result_mambo_g.png")
-```
-
-#### Results
-
-<div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
-  <div style="flex: 1; text-align: center;"> 
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_cn_union_result_mambo_g.png" alt="MAMBO-G 10 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>MAMBO-G 10-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_cn_union_result.png" alt="Original 10 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 10-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_cn_union_result_30.png" alt="Original 30 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 30-Steps</strong></p>
-  </div>
-</div> 
-
-### Qwen-Image Edit Pipeline
-
-#### Code Example
-
-```python
-
-import os
-from PIL import Image
-import torch
-
-from diffusers import QwenImageEditPipeline
-
-pipeline = QwenImageEditPipeline.from_pretrained("Qwen/Qwen-Image-Edit")
-pipeline.to(torch.bfloat16)
+modular_repo_id = "YiYiXu/QwenImage-modular"
+pipeline = blocks.init_pipeline(modular_repo_id)
+pipeline.load_components(torch_dtype=torch.bfloat16)
 pipeline.to("cuda")
-pipeline.set_progress_bar_config(disable=None)
-image = Image.open("./mambo-images/input1.jpg").convert("RGB")
-prompt = "Obtain the front view"
-inputs = {
-    "image": image,
-    "prompt": prompt,
-    "generator": torch.manual_seed(0),
-    "true_cfg_scale": 4.0,
-    "negative_prompt": " ",
-    "num_inference_steps": 5,
-}
-
-inputs_mambo_g = {
-    "image": image,
-    "prompt": prompt,
-    "generator": torch.manual_seed(0),
-    "true_cfg_scale": 10.0,
-    "negative_prompt": " ",
-    "num_inference_steps": 5,
-    "cfg_type": "mambo_g"
-}
-
-with torch.inference_mode():
-    output = pipeline(**inputs)
-    output_image = output.images[0]
-    output_image.save("image_edit.png")
-    output = pipeline(**inputs_mambo_g)
-    output_image = output.images[0]
-    output_image.save("image_edit_mambo_g.png")
-```
-#### Results
-
-<div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
-  <div style="flex: 1; text-align: center;"> 
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/image_edit_mambo_g.png" alt="MAMBO-G 5 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>MAMBO-G 5-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/image_edit.png" alt="Original 5 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 5-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/image_edit_30.png" alt="Original 15 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 15-Steps</strong></p>
-  </div>
-</div> 
-
-### Qwen-Image Image-to-Image Pipeline
-
-#### Code Example
-
-```python
-import torch
-from diffusers import QwenImageImg2ImgPipeline
-from diffusers.utils import load_image
-from PIL import Image
-
-pipe = QwenImageImg2ImgPipeline.from_pretrained("Qwen/Qwen-Image", torch_dtype=torch.bfloat16)
-pipe = pipe.to("cuda")
-url = "./mambo-images/sketch-mountains-input.jpg"
-init_image = Image.open(url).resize((1024, 1024))
-prompt = "A stunning fantasy landscape, trending on ArtStation. Majestic, sharp mountains dominate the background, under a luminous twilight sky filled with scattered, golden starlight. An ethereal, glowing blue river winds through the middle, separating a rugged, warm-toned desert on the left from a vibrant, emerald-green valley on the right, dotted with dark coniferous trees. A mystical purple castle, with towering spires, rises subtly on the right horizon. The atmosphere is imbued with a soft, magical mist and subtle, radiating energy ripples across the sky and landscape. Rendered as a highly detailed digital painting, focusing on atmospheric perspective, dramatic volumetric lighting, and rich, painterly textures. Epic, immersive, concept art style, sharp focus, 8K, cinematic wide shot."
-num_inference_steps=10
-images = pipe(prompt=prompt, negative_prompt=" ", image=init_image, strength=0.95, true_cfg_scale=4.0, num_inference_steps=num_inference_steps, generator=torch.Generator(device="cuda").manual_seed(42),).images[0]
-images.save("qwenimage_img2img.png")
-images = pipe(prompt=prompt, negative_prompt=" ", image=init_image, strength=0.95, true_cfg_scale=10.0, cfg_type="mambo_g", num_inference_steps=num_inference_steps, generator=torch.Generator(device="cuda").manual_seed(42)).images[0]
-images.save("qwenimage_img2img_mambo_g.png")
+prompt = "a comic potrait of a female necromancer with big and cute eyes, fine - face, realistic shaded perfect face, fine details. night setting. very anime style. realistic shaded lighting poster by ilya kuvshinov katsuhiro, magali villeneuve, artgerm, jeremy lipkin and michael garmash, rob rey and kentaro miura style, trending on art station"
+width, height = 1328, 1328
+num_inference_steps = 10 
+# num_inference_steps = 30
+seed = 1
+guider = ClassifierFreeGuidance(guidance_scale=4.0)
+pipeline.update_components(guider=guider)
+image = pipeline(prompt=prompt, width=width, height=height, output="images", num_inference_steps=num_inference_steps, generator=torch.Generator("cuda").manual_seed(seed))[0]
+image.save(f"t2v_original_{num_inference_steps}_steps.png")
+guider = MagnitudeAwareGuidance(guidance_scale=10.0, alpha=8.0, guidance_rescale=1.0)
+pipeline.update_components(guider=guider)
+image = pipeline(prompt=prompt, width=width, height=height, output="images", num_inference_steps=num_inference_steps, generator=torch.Generator("cuda").manual_seed(seed))[0]
+image.save(f"t2v_mambo_{num_inference_steps}_steps.png")
 ```
 
 #### Results
 
 <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
   <div style="flex: 1; text-align: center;"> 
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_img2img_mambo_g.png" alt="MAMBO-G 5 Steps" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/t2v_mambo_10_steps.png" alt="MAMBO-G 10 Steps" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>MAMBO-G 10-Steps</strong></p>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_img2img.png" alt="Original 5 Steps" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/t2v_original_10_steps.png" alt="Original 10 Steps" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>Baseline 10-Steps</strong></p>
   </div>
   <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/qwenimage_img2img_30.png" alt="Original 15 Steps" style="width: 100%; border-radius: 8px;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/t2v_mambo_30_steps.png" alt="MAMBO-G 30 Steps" style="width: 100%; border-radius: 8px;">
+    <p style="margin-top: 5px;"><strong>MAMBO-G 30-Steps</strong></p>
+  </div>
+  <div style="flex: 1; text-align: center;">
+    <img src="/MatrixTeam-OmniVeritas/mambo-images/t2v_original_30_steps.png" alt="Original 30 Steps" style="width: 100%; border-radius: 8px;">
     <p style="margin-top: 5px;"><strong>Baseline 30-Steps</strong></p>
   </div>
 </div> 
-
-### Qwen-Image Edit Plus Pipeline
-
-#### Code Example
-```python
-import os
-import torch
-from PIL import Image
-from diffusers import QwenImageEditPlusPipeline
-
-pipeline = QwenImageEditPlusPipeline.from_pretrained("Qwen/Qwen-Image-Edit-2509", torch_dtype=torch.bfloat16)
-print("pipeline loaded")
-
-pipeline.to('cuda')
-pipeline.set_progress_bar_config(disable=None)
-image1 = Image.open("./mambo-images/edit2509_1.jpg")
-image2 = Image.open("./mambo-images/edit2509_2.jpg")
-prompt = "The magician bear is on the left, the alchemist bear is on the right, facing each other in the central park square."
-inputs = {
-    "image": [image1, image2],
-    "prompt": prompt,
-    "generator": torch.manual_seed(42),
-    "true_cfg_scale": 4.0,
-    "negative_prompt": " ",
-    "num_inference_steps": 10,
-    "guidance_scale": 1.0,
-    "num_images_per_prompt": 1,
-}
-inputs_mambo = {
-    "image": [image1, image2],
-    "prompt": prompt,
-    "generator": torch.manual_seed(42),
-    "true_cfg_scale": 10.0,
-    "negative_prompt": " ",
-    "num_inference_steps": 10,
-    "guidance_scale": 1.0,
-    "num_images_per_prompt": 1,
-    "cfg_type": "mambo_g"
-}
-with torch.inference_mode():
-    output = pipeline(**inputs)
-    output_image = output.images[0]
-    output_image.save("output_image_edit_plus.png")
-    output = pipeline(**inputs_mambo)
-    output_image = output.images[0]
-    output_image.save("output_image_edit_plus_mambo.png")
-```
-
-#### Results
-
-<div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 10px;">
-  <div style="flex: 1; text-align: center;"> 
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/output_image_edit_plus_mambo.png" alt="MAMBO-G 5 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>MAMBO-G 10-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/output_image_edit_plus.png" alt="Original 5 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 10-Steps</strong></p>
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="/MatrixTeam-OmniVeritas/mambo-images/output_image_edit_plus_30.png" alt="Original 15 Steps" style="width: 100%; border-radius: 8px;">
-    <p style="margin-top: 5px;"><strong>Baseline 30-Steps</strong></p>
-  </div>
-</div> 
-
 
 ## Conclusion
 
